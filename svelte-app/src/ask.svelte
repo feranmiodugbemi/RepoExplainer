@@ -16,7 +16,7 @@
     isLoading = true;
     chats.push({role: "user", content: question });
 
-    const response = await fetch("http://127.0.0.1:5000/ask", {
+    const response = await fetch("https://repoexplainer.onrender.com/ask", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +34,7 @@
   }
 
   async function newRepo(){
-    const response = await fetch("http://127.0.0.1:5000/reset", {
+    const response = await fetch("https://repoexplainer.onrender.com/reset", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

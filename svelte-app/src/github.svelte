@@ -6,7 +6,7 @@
   async function submit() {
     isLoading = true;
     console.log(github_url)
-    const response = await fetch('http://127.0.0.1:5000/clone', {
+    const response = await fetch('https://repoexplainer.onrender.com/clone', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
