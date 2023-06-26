@@ -12,7 +12,7 @@ from flask_restful import Resource, Api
 import shutil
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/*": {"origins": ["http://localhost:8080/", "http://localhost:8080/ask"]}})
+cors = CORS(app)
 api = Api(app)
 
 
@@ -25,7 +25,6 @@ repo_filenames = None
 class CloneRepository(Resource):
     def post(self):
         global repo_index, repo_documents, repo_file_type_counts, repo_filenames
-
         data = request.get_json()
         github_url = data.get('github_url')
         if github_url:
