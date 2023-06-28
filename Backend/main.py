@@ -48,7 +48,7 @@ class AskQuestion(Resource):
             if repo_index is None:
                 return jsonify({'answer': '🙏 Apologies, Dev, but this repository includes files that RepoReader does not support. Kindly attempt with an alternative repository. 🔄💖'})
 
-            llm = OpenAI(api_key=OPENAI_API_KEY, temperature=0.8)
+            llm = OpenAI(api_key=OPENAI_API_KEY, temperature=0.8, max_tokens=4000)
 
             template = """
             Repo: {repo_name} | Conv: {conversation_history} | Docs: {numbered_documents} | Q: {question} | FileCount: {file_type_counts} | FileNames: {filenames}
