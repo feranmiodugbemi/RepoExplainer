@@ -3,39 +3,55 @@
     import Chat from "$lib/chat.svelte";
     import Notfound from "$lib/notfound.svelte";
     import { browser } from '$app/environment';
-    import {onMount} from 'svelte'
+    import {onMount, afterUpdate } from 'svelte'
     let github_url;
     onMount(()=>{
         github_url = window.localStorage.getItem("github_url");
     })
     let git_url = github_url
-    let isLoading = false;
-    let answer = "";
+    afterUpdate(() => {
+      git_url = github_url;
+    });
+    let answer;
     let question = "";
+    let isLoading = false;
     let chats = [
-      {role: "AI", content: `Your question about ${git_url}?` },
+      {role: "AI", content: `Ask your question` },
     ];
-    const id = Math.random().toString(36).substring(2, 11);
     async function answerRequest() {
       isLoading = true;
-      chats.push({role: "user", content: question });
-  
-      const response = await fetch("https://repoexplainer.onrender.com/ask", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      chats.push({ role: "user", content: question });
+
+      try {
+        const response = await fetch("https://repoexplainer.onrender.com/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           // Add any additional headers if required
-        },
-        body: JSON.stringify({ 'question':question }),
-      });
-  
-      const data = await response.json();
-      answer = data.answer;
-      chats.push({role: "AI", content: answer });
-  
-      isLoading = false;
+          },
+          body: JSON.stringify({ question: question }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Request failed with status: " + response.status);
+        }
+
+        const data = await response.json();
+
+        answer = data.answer || (data.error ? "Error: " + data.error : "Error making request");
+
+        chats.push({ role: "AI", content: answer });
+      } catch (error) {
+        // Handle the error appropriately
+        console.error("An error occurred:", error);
+        answer = "Error: " + error.message;
+        chats.push({ role: "AI", content: answer });
+      } finally {
+        isLoading = false;
+      }
       // Once the request is complete, you can update the `content` variable with the received text
     }
+
   
     async function newRepo(){
       const response = await fetch("https://repoexplainer.onrender.com/reset", {

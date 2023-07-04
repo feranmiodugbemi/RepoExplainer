@@ -2,6 +2,9 @@
     export let role;
     export let content;
     export let isLoading;
+    function startsWithError(word) {
+      return word.slice(0, 5) === "Error";
+  }
   </script>
   
   <div class="grid grid-cols-12 gap-y-2">
@@ -28,9 +31,15 @@
               {role}
             </div>
             <div class="relative ml-3 text-sm bg-white py-2 px-4 shadow rounded-xl">
-              <div class="animated-text">
+              {#if (startsWithError(content))}
+              <div class="animated-text text-red-700">
                 {content}
               </div>
+              {:else}
+              <div class="animated-text text-emerald-500">
+                {content}
+              </div>
+              {/if}
             </div>
           </div>
         </div>

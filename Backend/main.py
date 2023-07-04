@@ -27,15 +27,18 @@ class CloneRepository(Resource):
         global repo_index, repo_documents, repo_file_type_counts, repo_filenames
         data = request.get_json()
         github_url = data.get('github_url')
-        if github_url:
-            with tempfile.TemporaryDirectory() as local_path:
-                if clone_github_repo(github_url, local_path):
-                    repo_index, repo_documents, repo_file_type_counts, repo_filenames = load_and_index_files(local_path)
-                    return jsonify({'message': 'Repository cloned successfully.', 'repo': github_url})
-                else:
-                    return jsonify({'error': 'Failed to clone the repository.'})
-        else:
-            return jsonify({'error': 'Missing github_url parameter.'})
+        try:
+            if github_url:
+                with tempfile.TemporaryDirectory() as local_path:
+                    if clone_github_repo(github_url, local_path):
+                        repo_index, repo_documents, repo_file_type_counts, repo_filenames = load_and_index_files(local_path)
+                        return jsonify({'message': 'Repository cloned successfully.', 'repo': github_url})
+                    else:
+                        return jsonify({'error': 'Failed to clone the repository.'})
+            else:
+                return jsonify({'error': 'Missing github_url parameter.'})
+        except Exception as e:
+            return jsonify({'error': str(e)})
 
 
 class AskQuestion(Resource):

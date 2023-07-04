@@ -1,12 +1,16 @@
 <script>
     import Spinner from "$lib/spinner.svelte";
+    import Error from "$lib/error.svelte";
     import { browser } from '$app/environment';
     let isLoading = false;
     let github_url = '';
-  
+    let data;
+    let errors = [];
+    let iserr = false
     async function submit() {
       isLoading = true;
       console.log(github_url)
+      try {
       const response = await fetch('https://repoexplainer.onrender.com/clone', {
         method: 'POST',
         headers: {
@@ -14,23 +18,34 @@
         },
         body: JSON.stringify({ "github_url": github_url }),
       });
-  
-      const data = await response.json();
+      if (!response.ok) {
+        errors.push("Request failed with status: " + response.status);
+        throw new Error("Request failed with status: " + response.status);
+      }
+      data = await response.json();
       let github_url_data = data.repo;
-  
+
       if (github_url_data) {
-        if(browser){
+        if (browser) {
           window.localStorage.setItem('github_url', github_url_data);
           isLoading = false;
           window.location.href = '/ask';
         }
+      } else if (data.error) {
+        errors.push(data.error);
+        iserr = true;
       }
-      else if (data.error){
-        alert("Can't redirect due to error")
-      }
+    } catch (error) {
+      console.log(error);
+      errors.push(error)
+      iserr = true;
+    } finally {
+      isLoading = false;
+    }
   
     }
-  </script>
+
+</script>
   
   
   <!-- component -->
@@ -56,6 +71,9 @@
   
   {#if isLoading}
      <Spinner/>
+  {/if}
+  {#if iserr}
+    <Error errors={errors} showError={iserr}/>
   {/if}
   
   <!-- Container for demo purpose -->
